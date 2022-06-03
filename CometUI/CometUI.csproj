@@ -45,8 +45,17 @@
     <Compile Include="CometCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometLogConsole.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CometLogConsole.Designer.cs">
+      <DependentUpon>CometLogConsole.cs</DependentUpon>
+    </Compile>
     <Compile Include="CometForm.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CometGradientButton.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="CometLabel.cs">
       <SubType>Component</SubType>
@@ -61,6 +70,11 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CometLogConsole.resx">
+      <DependentUpon>CometLogConsole.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -32,7 +32,9 @@
 			// 
 			// MainForm
 			// 
+			this.CanResize = false;
 			this.ClientSize = new System.Drawing.Size(375, 325);
+			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "CometUI Demo";
