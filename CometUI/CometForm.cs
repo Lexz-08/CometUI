@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -86,7 +87,6 @@ namespace CometUI
 			ForeColor = Color.FromArgb(200, 200, 200);
 
 			MinimumSize = new Size(375, 325);
-
 			FormBorderStyle = FormBorderStyle.None;
 		}
 
@@ -103,9 +103,23 @@ namespace CometUI
 		[DllImport("user32.dll")]
 		private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
+		[DllImport("user32.dll")]
+		private static extern IntPtr LoadCursorFromFile(string lpFilename);
+
+		private Cursor LoadFromRegistry(string Name)
+		{
+			string path = Registry.CurrentUser.OpenSubKey("Control Panel").OpenSubKey("Cursors").GetValue(Name).ToString();
+			IntPtr handle = string.IsNullOrEmpty(path) ? IntPtr.Zero : LoadCursorFromFile(path);
+			Cursor cursor = handle == IntPtr.Zero ? null : new Cursor(handle);
+
+			return cursor;
+		}
+
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
+
+			Cursor hand = LoadFromRegistry("Hand") ?? Cursors.Hand;
 
 			if ((left.Contains(e.Location) || right.Contains(e.Location)) && canResize)
 				Cursor = Cursors.SizeWE;
@@ -118,7 +132,7 @@ namespace CometUI
 			else if (close.Contains(e.Location) ||
 				(minimize.Contains(e.Location) && MinimizeBox) ||
 				(MinimizeBox && MaximizeBox && maximize.Contains(e.Location) && canResize))
-				Cursor = Cursors.Hand;
+				Cursor = hand;
 			else Cursor = Cursors.Default;
 
 			Invalidate();
