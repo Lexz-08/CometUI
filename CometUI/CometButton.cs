@@ -9,7 +9,10 @@ namespace CometUI
 	{
 		public CometButton()
 		{
-			SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer, true);
+			SetStyle(ControlStyles.AllPaintingInWmPaint |
+					ControlStyles.UserPaint |
+					ControlStyles.ResizeRedraw |
+					ControlStyles.OptimizedDoubleBuffer, true);
 			DoubleBuffered = true;
 
 			Font = new Font("Segoe UI", 10.0f);
