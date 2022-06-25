@@ -1,16 +1,23 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometTextBox : Control
+	public class CometFolderInput : Control
 	{
 		private Color borderColor = Color.FromArgb(70, 70, 70);
 		private Color focusedBorderColor = Color.DodgerBlue;
 		private Color currentBorderColor = Color.FromArgb(70, 70, 70);
+		private Color fileChooserColor = Color.DodgerBlue;
 		private bool underlineBorder = false;
+		private string dialogTitle = "Please choose a folder...";
+		private Environment.SpecialFolder rootFolder = Environment.SpecialFolder.Desktop;
 		private TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
 
 		/// <summary>
@@ -36,13 +43,23 @@ namespace CometUI
 		public Color FocusedBorderColor
 		{
 			get { return focusedBorderColor; }
-			set 
-			{ 
+			set
+			{
 				focusedBorderColor = value;
 				if (internalTextBox.Focused)
 					currentBorderColor = value;
-				Invalidate(); 
+				Invalidate();
 			}
+		}
+
+		/// <summary>
+		/// The background color of the textbox file chooser button when the mouse is hovered over it.
+		/// </summary>
+		[Description("The background color of the textbox file chooser button when the mouse is hovered over it.")]
+		public Color FileChooserColor
+		{
+			get { return fileChooserColor; }
+			set { fileChooserColor = value; Invalidate(); }
 		}
 
 		/// <summary>
@@ -54,6 +71,33 @@ namespace CometUI
 			get { return underlineBorder; }
 			set { underlineBorder = value; Invalidate(); }
 		}
+
+		/// <summary>
+		/// The title of the file dialog when the user chooses a file.
+		/// </summary>
+		[Description("The title of the file dialog when the user chooses a file.")]
+		public string DialogTitle
+		{
+			get { return dialogTitle; }
+			set { dialogTitle = value; Invalidate(); }
+		}
+
+		/// <summary>
+		/// The root folder of the folder dialog.
+		/// </summary>
+		[Description("The root folder of the folder dialog.")]
+		public Environment.SpecialFolder RootFolder
+		{
+			get { return rootFolder; }
+			set { rootFolder = value; Invalidate(); }
+		}
+
+		/// <summary>
+		/// The folder selected from the folder dialog.
+		/// </summary>
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Always)]
+		public string Folder => internalTextBox.Text;
 
 		/// <summary>
 		/// The background color of the textbox.
@@ -104,24 +148,12 @@ namespace CometUI
 			}
 		}
 
-		/// <summary>
-		/// The text displayed in the textbox.
-		/// </summary>
-		[Description("The text displayed in the textbox.")]
-		public override string Text
-		{
-			get { return internalTextBox.Text; }
-			set
-			{
-				internalTextBox.Text = value;
-				internalTextBox.Invalidate();
-				Invalidate();
-				OnTextChanged(null);
-			}
-		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+		public override string Text => string.Empty;
 
 		/// <summary>
-		/// The cursor used to indicate interactibility with the user.
+		/// The cursor used the indicate interactibility with the user.
 		/// </summary>
 		[Description("The cursor used to indicate interactibility with the user.")]
 		public override Cursor Cursor
@@ -136,41 +168,19 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// Determines whether or not the textbox can display multiple lines of text at once.
-		/// </summary>
-		[Description("Determines whether or not the textbox can display multiple lines of text at once.")]
-		public bool Multiline
-		{
-			get { return internalTextBox.Multiline; }
-			set { internalTextBox.Multiline = value; internalTextBox.Invalidate(); Invalidate(); }
-		}
-
-		/// <summary>
-		/// Determines whether or not the textbox's text can be edited at runtime by the user.
-		/// </summary>
-		[Description("Determines whether or not the textbox's text can be edited at runtime by the user.")]
-		public bool Readonly
-		{
-			get { return internalTextBox.ReadOnly; }
-			set { internalTextBox.ReadOnly = value; internalTextBox.Invalidate(); Invalidate(); }
-		}
-
-		/// <summary>
-		/// Determines whether or not the textbox will display a password character instead of normal text when rendering/displaying the textbox text.
-		/// </summary>
-		[Description("Determines whether or not the textbox will display a password character instead of normal text when rendering/displaying the textbox text.")]
-		public bool UseSystemPasswordChar
-		{
-			get { return internalTextBox.UseSystemPasswordChar; }
-			set { internalTextBox.UseSystemPasswordChar = value; internalTextBox.Invalidate(); Invalidate(); }
-		}
-
-		/// <summary>
 		/// Indicates whether or not the control is currently focused with keyboard input.
 		/// </summary>
 		public override bool Focused => internalTextBox.Focused;
 
-		public CometTextBox()
+		public event EventHandler FolderSelected;
+
+		protected void OnFolderSelected(EventArgs e)
+		{
+			FolderSelected?.Invoke(this, e);
+			Invalidate();
+		}
+
+		public CometFolderInput()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
@@ -183,11 +193,12 @@ namespace CometUI
 			ForeColor = Color.FromArgb(200, 200, 200);
 			Width = 200;
 
-			Cursor = Cursors.IBeam;
+			Cursor = Cursors.Default;
 
 			internalTextBox.Location = new Point(4, 4);
-			internalTextBox.Width = Width - 8;
+			internalTextBox.Width = Width - 32;
 			internalTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+			internalTextBox.ReadOnly = true;
 
 			internalTextBox.GotFocus += (s, e) => UpdateBorderColor();
 			internalTextBox.LostFocus += (s, e) => { OnLostFocus(e); };
@@ -196,6 +207,11 @@ namespace CometUI
 
 			Controls.Add(internalTextBox);
 		}
+
+		private Rectangle file;
+
+		[DllImport("user32.dll")]
+		private static extern IntPtr LoadCursorFromFile(string lpFilename);
 
 		private void UpdateBorderColor()
 		{
@@ -209,9 +225,6 @@ namespace CometUI
 		private void UpdateHeight()
 		{
 			if (Height < internalTextBox.Height + 8)
-				Height = internalTextBox.Height + 8;
-
-			if (!Multiline)
 				Height = internalTextBox.Height + 8;
 		}
 
@@ -259,13 +272,68 @@ namespace CometUI
 		{
 			base.OnMouseDown(e);
 
-			internalTextBox.Focus();
+			if (file.Contains(e.Location))
+			{
+				using (FolderBrowserDialog fbd = new FolderBrowserDialog
+				{
+					Description = dialogTitle,
+					RootFolder = rootFolder,
+					ShowNewFolderButton = true,
+				}) if (fbd.ShowDialog() == DialogResult.OK)
+				{
+					internalTextBox.Text = fbd.SelectedPath;
+					internalTextBox.Invalidate();
+				}
+
+				OnFolderSelected(e);
+			}
+			else internalTextBox.Focus();
+
+			Invalidate();
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
+
+			if (file.Contains(e.Location))
+			{
+				string cursorPath = Registry.CurrentUser.OpenSubKey("Control Panel").OpenSubKey("Cursors").GetValue("Hand").ToString();
+				IntPtr cursorHandle = string.IsNullOrEmpty(cursorPath) ? IntPtr.Zero : LoadCursorFromFile(cursorPath);
+				Cursor cursorHand = cursorHandle == IntPtr.Zero ? Cursors.Hand : new Cursor(cursorHandle);
+
+				Cursor = cursorHand;
+			}
+			else Cursor = Cursors.Default;
+
+			Invalidate();
+		}
+		protected override void OnMouseLeave(EventArgs e)
+		{
+			base.OnMouseLeave(e);
+
+			Cursor = Cursors.Default;
 			Invalidate();
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
+
+			file = new Rectangle(Width - Height - 1, 1, Height - 2, Height - 2);
+
+			Bitmap chooserBmp = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("CometUI.Images.file-chooser.png"));
+
+			ImageAttributes imageAttr = new ImageAttributes();
+			ColorMap clrMap = new ColorMap();
+
+			clrMap.OldColor = Color.Black;
+			clrMap.NewColor = file.Contains(PointToClient(MousePosition)) ? fileChooserColor : borderColor;
+
+			ColorMap[] remapeTable = { clrMap };
+			imageAttr.SetRemapTable(remapeTable, ColorAdjustType.Bitmap);
+
+			e.Graphics.DrawImage(chooserBmp, file, 0, 0, chooserBmp.Width, chooserBmp.Height, GraphicsUnit.Pixel, imageAttr);
 
 			if (underlineBorder)
 				e.Graphics.FillRectangle(new SolidBrush(currentBorderColor), 0, Height - 1, Width, 1);

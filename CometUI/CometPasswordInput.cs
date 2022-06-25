@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometTextBox : Control
+	public class CometPasswordInput : Control
 	{
 		private Color borderColor = Color.FromArgb(70, 70, 70);
 		private Color focusedBorderColor = Color.DodgerBlue;
@@ -136,16 +136,6 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// Determines whether or not the textbox can display multiple lines of text at once.
-		/// </summary>
-		[Description("Determines whether or not the textbox can display multiple lines of text at once.")]
-		public bool Multiline
-		{
-			get { return internalTextBox.Multiline; }
-			set { internalTextBox.Multiline = value; internalTextBox.Invalidate(); Invalidate(); }
-		}
-
-		/// <summary>
 		/// Determines whether or not the textbox's text can be edited at runtime by the user.
 		/// </summary>
 		[Description("Determines whether or not the textbox's text can be edited at runtime by the user.")]
@@ -156,21 +146,11 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// Determines whether or not the textbox will display a password character instead of normal text when rendering/displaying the textbox text.
-		/// </summary>
-		[Description("Determines whether or not the textbox will display a password character instead of normal text when rendering/displaying the textbox text.")]
-		public bool UseSystemPasswordChar
-		{
-			get { return internalTextBox.UseSystemPasswordChar; }
-			set { internalTextBox.UseSystemPasswordChar = value; internalTextBox.Invalidate(); Invalidate(); }
-		}
-
-		/// <summary>
 		/// Indicates whether or not the control is currently focused with keyboard input.
 		/// </summary>
 		public override bool Focused => internalTextBox.Focused;
 
-		public CometTextBox()
+		public CometPasswordInput()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
@@ -185,9 +165,10 @@ namespace CometUI
 
 			Cursor = Cursors.IBeam;
 
-			internalTextBox.Location = new Point(4, 4);
+			internalTextBox.Location = new Point(4, 3);
 			internalTextBox.Width = Width - 8;
 			internalTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+			internalTextBox.UseSystemPasswordChar = true;
 
 			internalTextBox.GotFocus += (s, e) => UpdateBorderColor();
 			internalTextBox.LostFocus += (s, e) => { OnLostFocus(e); };
@@ -209,9 +190,6 @@ namespace CometUI
 		private void UpdateHeight()
 		{
 			if (Height < internalTextBox.Height + 8)
-				Height = internalTextBox.Height + 8;
-
-			if (!Multiline)
 				Height = internalTextBox.Height + 8;
 		}
 
