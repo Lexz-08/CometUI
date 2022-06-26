@@ -16,6 +16,7 @@ namespace CometUI
 		private Color minimizeColor = Color.Green;
 		private Color maximizeColor = Color.CornflowerBlue;
 		private bool canResize = true;
+		private bool useWinDropShadow = true;
 
 		/// <summary>
 		/// The background color for the CometForm's header.
@@ -74,6 +75,18 @@ namespace CometUI
 				Invalidate();
 			}
 		}
+
+		/// <summary>
+		/// Determines whether or not the CometForm will use the current Windows drop-shadow.<br/><br/>
+		/// <b>Important Note</b>: Only works if Aero theme is enabled on the device.
+		/// </summary>
+		[Description("Determines whether or not the CometForm will use the curent Windows drop-shadow.\n\nImportant Note: Only works if Aero theme is enabled on the device.")]
+		public bool UseWindowsDropShadow
+		{
+			get { return useWinDropShadow; }
+			set { useWinDropShadow = value; Invalidate(); }
+		}
+
 		public CometForm()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
@@ -216,6 +229,20 @@ namespace CometUI
 		{
 			base.OnPaint(e);
 
+			if (m_aeroEnabled && useWinDropShadow)
+			{
+				int v = 2;
+				DwmSetWindowAttribute(Handle, 2, ref v, 4);
+				MARGINS margins = new MARGINS
+				{
+					leftWidth = 0,
+					rightWidth = 0,
+					topHeight = 1,
+					bottomHeight = 0,
+				};
+				DwmExtendFrameIntoClientArea(Handle, ref margins);
+			}
+
 			e.Graphics.SmoothingMode = SmoothingMode.None;
 			e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 			e.Graphics.TextContrast = 0;
@@ -292,5 +319,55 @@ namespace CometUI
 					new Point(minimize.X + minimize.Width - 6, minimize.Y + (minimize.Width / 2) + 1));
 			}
 		}
+
+		#region Custom Drop-Shadow
+
+		private bool m_aeroEnabled = false;
+
+		[DllImport("dwmapi.dll")]
+		private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+
+		[DllImport("dwmapi.dll")]
+		private static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int attrValue, int attrSize);
+
+		[DllImport("dwmapi.dll")]
+		private static extern int DwmIsCompositionEnabled(ref int pfEnabled);
+
+		private bool CheckAeroEnabled()
+		{
+			if (Environment.OSVersion.Version.Major >= 6)
+			{
+				int enabled = 0;
+				DwmIsCompositionEnabled(ref enabled);
+
+				return enabled == 1;
+			}
+
+			return false;
+		}
+
+		private struct MARGINS
+		{
+			public int leftWidth;
+			public int rightWidth;
+			public int topHeight;
+			public int bottomHeight;
+		}
+
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				CreateParams cp = base.CreateParams;
+				m_aeroEnabled = CheckAeroEnabled();
+
+				if (!m_aeroEnabled && useWinDropShadow)
+					cp.ClassStyle |= 0x20000;
+
+				return cp;
+			}
+		}
+
+		#endregion
 	}
 }

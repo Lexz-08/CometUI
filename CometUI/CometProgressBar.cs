@@ -56,7 +56,7 @@ namespace CometUI
 		/// <summary>
 		/// The progress value the goes to if its reset.
 		/// </summary>
-		[Description("The progress value the control goes to if its reset.")]
+		[Description("The progress value the control goes to if it's reset.")]
 		public double DefaultValue
 		{
 			get { return defValue; }
@@ -104,6 +104,12 @@ namespace CometUI
 		public event EventHandler Started;
 
 		/// <summary>
+		/// Occurs when the progress value has changed.
+		/// </summary>
+		[Description("Occurs when the progress value has changed.")]
+		public event EventHandler ValueChanged;
+
+		/// <summary>
 		/// Raises the <see cref="Completed"/> event.
 		/// </summary>
 		protected void OnCompleted(EventArgs e)
@@ -118,6 +124,12 @@ namespace CometUI
 		protected void OnStarted(EventArgs e)
 		{
 			Started?.Invoke(this, e);
+			Invalidate();
+		}
+
+		protected void OnValueChanged(EventArgs e)
+		{
+			ValueChanged?.Invoke(this, e);
 			Invalidate();
 		}
 
@@ -137,10 +149,17 @@ namespace CometUI
 		/// <summary>
 		/// Increases the current progress by the specified value within a specified constrain.
 		/// </summary>
-		/// <param name="Value">The amount to increase the current progress by.</param>
-		public void IncreaseProgress(double Value)
+		/// <param name="Amount">The amount to increase the current progress by.</param>
+		public void IncreaseProgress(double Amount)
 		{
-			value = Math.Max(1, Math.Min(Value, maximum));
+			if (value == maximum)
+				return;
+
+			if (Amount < 1)
+				value++;
+			else if (Amount > Math.Abs(Math.Abs(maximum) - Amount))
+				value = maximum;
+			else value += Amount;
 
 			if (value == maximum) OnCompleted(null);
 			Invalidate();
@@ -149,13 +168,28 @@ namespace CometUI
 		/// <summary>
 		/// Decreases the current progress by the specified value within a specified constrain.
 		/// </summary>
-		/// <param name="Value">The amount to decrease the current progress by.</param>
-		public void DecreaseProgress(double Value)
+		/// <param name="Amount">The amount to decrease the current progress by.</param>
+		public void DecreaseProgress(double Amount)
 		{
-			value = Math.Max(minimum, Math.Min(Value, minimum + 1));
+			if (value == minimum)
+				return;
+
+			if (Amount < 1)
+				value--;
+			else if (Amount > Math.Abs(Math.Abs(minimum) - Amount))
+				value = minimum;
+			else value -= Amount;
 
 			if (value == minimum) OnStarted(null);
 			Invalidate();
+		}
+
+		/// <summary>
+		/// Resets the progress value of the control to the currently set default value.
+		/// </summary>
+		public void ResetValue()
+		{
+			value = defValue;
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
