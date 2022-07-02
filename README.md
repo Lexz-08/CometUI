@@ -3,4 +3,4 @@
 A basic Windows Forms UI kit for simple UI creation.
 
 ## Download
-[Standalone](https://github.com/Lexz-08/CometUI/releases/download/1.0.2/CometUI.dll)
+[Standalone](https://github.com/Lexz-08/CometUI/releases/latest/download/CometUI.dll)
