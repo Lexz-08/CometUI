@@ -17,6 +17,7 @@ namespace CometUI
 		private Color maximizeColor = Color.CornflowerBlue;
 		private bool canResize = true;
 		private bool useWinDropShadow = true;
+		private FormWindowState winState;
 
 		/// <summary>
 		/// The background color for the CometForm's header.
@@ -87,6 +88,14 @@ namespace CometUI
 			set { useWinDropShadow = value; Invalidate(); }
 		}
 
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+		public new FormBorderStyle FormBorderStyle
+		{
+			get { return base.FormBorderStyle; }
+			set { base.FormBorderStyle = value; Invalidate(); }
+		}
+
 		public CometForm()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
@@ -99,8 +108,10 @@ namespace CometUI
 			BackColor = Color.FromArgb(25, 25, 25);
 			ForeColor = Color.FromArgb(200, 200, 200);
 
-			MinimumSize = new Size(375, 325);
+			MinimumSize = new Size(200, 100);
 			FormBorderStyle = FormBorderStyle.None;
+
+			winState = WindowState;
 		}
 
 		private Rectangle left, topLeft, bottomLeft,
@@ -229,6 +240,8 @@ namespace CometUI
 		{
 			base.OnPaint(e);
 
+			#region Drop Shadow
+
 			if (m_aeroEnabled && useWinDropShadow)
 			{
 				int v = 2;
@@ -242,6 +255,8 @@ namespace CometUI
 				};
 				DwmExtendFrameIntoClientArea(Handle, ref margins);
 			}
+
+			#endregion
 
 			e.Graphics.SmoothingMode = SmoothingMode.None;
 			e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -300,18 +315,49 @@ namespace CometUI
 					maximize = new Rectangle(close.X - headerHeight, minimize.Y, headerHeight, headerHeight);
 					minimize = new Rectangle(maximize.X - headerHeight, maximize.Y, headerHeight, headerHeight);
 
-					e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-						new Point(maximize.X + 6, maximize.Y + 6),
-						new Point(maximize.X + 6, maximize.Y + maximize.Height - 6));
-					e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-						new Point(maximize.X + 6, maximize.Y + maximize.Height - 6),
-						new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6));
-					e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-						new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6),
-						new Point(maximize.X + maximize.Width - 6, maximize.Y + 6));
-					e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-						new Point(maximize.X + maximize.Width - 6, maximize.Y + 6),
-						new Point(maximize.X + 6, maximize.Y + 6));
+					if (WindowState == FormWindowState.Maximized)
+					{
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 6, maximize.Y + 8),
+							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6),
+							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 6),
+							new Point(maximize.X + maximize.Width - 8, maximize.Y + 8));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 8, maximize.Y + 8),
+							new Point(maximize.X + 6, maximize.Y + 8));
+
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 8, maximize.Y + 8),
+							new Point(maximize.X + 8, maximize.Y + 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 8, maximize.Y + 6),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 8));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 8),
+							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 8));
+					}
+					else if (WindowState == FormWindowState.Normal)
+					{
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 6, maximize.Y + 6),
+							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6));
+						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
+							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6),
+							new Point(maximize.X + 6, maximize.Y + 6));
+					}
 				}
 
 				e.Graphics.DrawLine(new Pen(minimize.Contains(mouse) ? minimizeColor : ForeColor, 1.0f),

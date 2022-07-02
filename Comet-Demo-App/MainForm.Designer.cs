@@ -33,9 +33,8 @@
 			// MainForm
 			// 
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
-			this.CanResize = false;
 			this.ClientSize = new System.Drawing.Size(375, 325);
-			this.MaximizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(200, 100);
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "CometUI - Demo App";
