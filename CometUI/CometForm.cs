@@ -17,7 +17,6 @@ namespace CometUI
 		private Color maximizeColor = Color.CornflowerBlue;
 		private bool canResize = true;
 		private bool useWinDropShadow = true;
-		private FormWindowState winState;
 
 		/// <summary>
 		/// The background color for the CometForm's header.
@@ -96,6 +95,21 @@ namespace CometUI
 			set { base.FormBorderStyle = value; Invalidate(); }
 		}
 
+		/// <summary>
+		/// Occurs when the form's window state changes.
+		/// </summary>
+		[Description("Occurs when the form's window state changes.")]
+		public event EventHandler WindowStateChanged;
+
+		/// <summary>
+		/// Raises the <see cref="WindowStateChanged"/> event.
+		/// </summary>
+		protected void OnWindowStateChanged(EventArgs e)
+		{
+			WindowStateChanged?.Invoke(this, e);
+			Invalidate();
+		}
+
 		public CometForm()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
@@ -110,15 +124,13 @@ namespace CometUI
 
 			MinimumSize = new Size(200, 100);
 			FormBorderStyle = FormBorderStyle.None;
-
-			winState = WindowState;
 		}
 
 		private Rectangle left, topLeft, bottomLeft,
 			right, topRight, bottomRight,
 			top, bottom, close, minimize, maximize;
 
-		private const int headerHeight = 22,
+		protected const int headerHeight = 22,
 			resizeBorder = 6;
 
 		[DllImport("user32.dll")]
@@ -165,7 +177,18 @@ namespace CometUI
 		{
 			base.OnMouseDown(e);
 
-			if (left.Contains(e.Location) && canResize)
+			if (close.Contains(e.Location))
+				Close();
+			else if (minimize.Contains(e.Location) && MinimizeBox)
+				WindowState = FormWindowState.Minimized;
+			else if (maximize.Contains(e.Location) && MinimizeBox && MaximizeBox && canResize)
+			{
+				if (WindowState == FormWindowState.Maximized)
+					WindowState = FormWindowState.Normal;
+				else if (WindowState == FormWindowState.Normal)
+					WindowState = FormWindowState.Maximized;
+			}
+			else if (left.Contains(e.Location) && canResize)
 			{
 				ReleaseCapture();
 				SendMessage(Handle, 161, 10, 0);
@@ -217,17 +240,6 @@ namespace CometUI
 			{
 				ReleaseCapture();
 				SendMessage(Handle, 161, 2, 0);
-			}
-			else if (close.Contains(e.Location))
-				Close();
-			else if (minimize.Contains(e.Location) && MinimizeBox)
-				WindowState = FormWindowState.Minimized;
-			else if (maximize.Contains(e.Location) && MinimizeBox && MaximizeBox && canResize)
-			{
-				if (WindowState == FormWindowState.Maximized)
-					WindowState = FormWindowState.Normal;
-				else if (WindowState == FormWindowState.Normal)
-					WindowState = FormWindowState.Maximized;
 			}
 		}
 
@@ -364,6 +376,33 @@ namespace CometUI
 					new Point(minimize.X + 6, minimize.Y + (minimize.Width / 2) + 1),
 					new Point(minimize.X + minimize.Width - 6, minimize.Y + (minimize.Width / 2) + 1));
 			}
+		}
+
+		protected override void OnClientSizeChanged(EventArgs e)
+		{
+			base.OnClientSizeChanged(e);
+
+			switch (WindowState)
+			{
+				case FormWindowState.Maximized:
+				case FormWindowState.Minimized:
+				case FormWindowState.Normal:
+					OnWindowStateChanged(e);
+					break;
+			}
+		}
+
+		protected override void OnResizeEnd(EventArgs e)
+		{
+			base.OnResizeEnd(e);
+
+			int screenY = Screen.FromPoint(Location).Bounds.Location.Y;
+
+			bool wndSnap = Location.Y <= screenY + 10 && Location.Y >= screenY;
+			bool mouseSnap = MousePosition.Y <= screenY + 10 && MousePosition.Y >= screenY;
+
+			if (wndSnap || mouseSnap)
+				WindowState = FormWindowState.Maximized;
 		}
 
 		#region Custom Drop-Shadow

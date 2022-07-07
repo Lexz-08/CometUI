@@ -1,22 +1,25 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace CometUI
 {
-	internal class RoundRect
+	internal static class RoundRect
 	{
-		public static GraphicsPath CreateRoundRect(int x, int y, int w, int h, int r)
+		public static GraphicsPath Roundify(int x, int y, int w, int h, int radius, bool outline)
 		{
-			int r2 = r * 2;
-			int r3 = (int)(r * 2.2);
-			int r4 = (int)(r * 2.1);
-			int offset = 1;
+			return Roundify(new Rectangle(x, y, w, h), radius, outline);
+		}
 
+		private static GraphicsPath Roundify(Rectangle rect, int radius, bool outline)
+		{
 			GraphicsPath path = new GraphicsPath();
+			radius *= 2;
+
 			path.StartFigure();
-			path.AddArc(x, y, r2, r2, 180, 90);
-			path.AddArc(x + w - r2 - offset, y, r2, r4, 270, 90);
-			path.AddArc(x + w - r3 - offset, y + h - r3 - offset, r3, r3, 0, 90);
-			path.AddArc(x, y + h - r4 - offset, r2, r4, 90, 90);
+			path.AddArc(rect.X, rect.X, radius / (outline ? 1.1f : 1.05f), radius / (outline ? 1.1f : 1.05f), 180, 90);
+			path.AddArc(rect.X + rect.Width - radius, rect.Y, radius, radius, 270, 90);
+			path.AddArc(rect.X + rect.Width - radius, rect.Y + rect.Height - radius, radius, radius, 0, 90);
+			path.AddArc(rect.X, rect.Y + rect.Height - radius, radius, radius, 90, 90);
 			path.CloseFigure();
 
 			return path;

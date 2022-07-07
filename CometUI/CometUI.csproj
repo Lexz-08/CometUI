@@ -76,6 +76,12 @@
     <Compile Include="CometRadioButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometRoundButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CometRoundGradientButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometTabControl.cs">
       <SubType>Component</SubType>
     </Compile>

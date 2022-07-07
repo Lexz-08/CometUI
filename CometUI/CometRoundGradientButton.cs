@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -8,11 +7,12 @@ using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometGradientButton : Control
+	public class CometRoundGradientButton : Control
 	{
 		private Color gradientColor1 = Color.FromArgb(40, 40, 40);
 		private Color gradientColor2 = Color.FromArgb(90, 90, 90);
 		private float gradientAngle = 45.0f;
+		private int radius = 4;
 
 		/// <summary>
 		/// The first color used in the gradience.
@@ -44,22 +44,38 @@ namespace CometUI
 			set { gradientAngle = value; Invalidate(); }
 		}
 
+		/// <summary>
+		/// The arc length of the corners of the control.
+		/// </summary>
+		[Description("The arc length of the corners of the control.")]
+		public int BorderRadius
+		{
+			get { return radius; }
+			set { radius = value; Invalidate(); }
+		}
+
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-		public override Color BackColor => Color.Empty;
+		public override Color BackColor
+		{
+			get { return base.BackColor; }
+			set { base.BackColor = value; OnBackColorChanged(null); Invalidate(); }
+		}
 
-		public CometGradientButton()
+		public CometRoundGradientButton()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
 					ControlStyles.ResizeRedraw |
-					ControlStyles.OptimizedDoubleBuffer, true);
+					ControlStyles.OptimizedDoubleBuffer |
+					ControlStyles.SupportsTransparentBackColor, true);
 			DoubleBuffered = true;
 
 			Font = new Font("Segoe UI", 10.0f);
+			BackColor = Color.Transparent;
 			ForeColor = Color.FromArgb(200, 200, 200);
 
-			Size = new Size(160, 40);
+			Size = new Size(190, 40);
 			Cursor = Cursors.Hand;
 		}
 
@@ -108,26 +124,28 @@ namespace CometUI
 			e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 			e.Graphics.TextContrast = 0;
 
+			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 			LinearGradientBrush lgb = new LinearGradientBrush(new Rectangle(0, 0, Width, Height), gradientColor1, gradientColor2, gradientAngle);
-			e.Graphics.FillRectangle(lgb, 0, 0, Width, Height);
+			GraphicsPath path = RoundRect.Roundify(0, 0, Width - 1, Height - 1, radius, false);
+			e.Graphics.FillPath(lgb, path);
 
 			byte brightness = (byte)((gradientColor1.Brightness() + gradientColor2.Brightness()) / 2);
 
 			if (brightness > 127)
 			{
 				if (mouseOver)
-					e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(20, Color.Black)), 0, 0, Width, Height);
+					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(20, Color.Black)), path);
 
 				if (mouseDown)
-					e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(60, Color.White)), 0, 0, Width, Height);
+					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(60, Color.White)), path);
 			}
 			else if (brightness <= 127)
 			{
 				if (mouseOver)
-					e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(60, Color.White)), 0, 0, Width, Height);
+					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(60, Color.White)), path);
 
 				if (mouseDown)
-					e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(40, Color.Black)), 0, 0, Width, Height);
+					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(40, Color.Black)), path);
 			}
 
 			e.Graphics.DrawString(Text, Font, new SolidBrush(ForeColor),

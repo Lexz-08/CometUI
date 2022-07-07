@@ -88,7 +88,7 @@ namespace CometUI
 			}
 
 			e.Graphics.DrawString(Text, Font, new SolidBrush(ForeColor),
-				new Rectangle(0, 0, Width, Height),
+				new Rectangle(0, Height % 2 == 0 ? 1 : 0, Width, Height),
 				new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 		}
 	}
