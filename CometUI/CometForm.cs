@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -130,6 +131,14 @@ namespace CometUI
 			right, topRight, bottomRight,
 			top, bottom, close, minimize, maximize;
 
+		private Rectangle ctCaption1, ctCaption2;
+		private Color ctCaptionClr1, ctCaptionClr2;
+		private Color ctCaptionClr1_Orig, ctCaptionClr2_Orig;
+		private Image captionCnt1, captionCnt2;
+		private bool allowCaption1, allowCaption2;
+
+		private EventHandler captionClick1, captionClick2;
+
 		protected const int headerHeight = 22,
 			resizeBorder = 6;
 
@@ -151,6 +160,42 @@ namespace CometUI
 			return cursor;
 		}
 
+		/// <summary>
+		/// Adds a new caption button to the header of the form.
+		/// </summary>
+		/// <param name="InteractionContent">The image to display where the button would be.</param>
+		/// <param name="OriginalImageColor">The original, solid color of the image provided.</param>
+		/// <param name="HoverColor">The color to change the image to when the mouse is hovered over where the button would be.</param>
+		/// <param name="ClickEvent">The method to invoke when the user clicks on the added button.</param>
+		public void AddCustomCaptionButton(Image InteractionContent, Color OriginalImageColor, Color HoverColor, EventHandler ClickEvent)
+		{
+			if (InteractionContent == null)
+				throw new ArgumentNullException("InteractionContent");
+			else if (HoverColor == null)
+				throw new ArgumentNullException("HoverColor");
+			else if (ClickEvent == null)
+				throw new ArgumentNullException("ClickEvent");
+
+			if (!allowCaption1)
+			{
+				allowCaption1 = true;
+				ctCaptionClr1_Orig = OriginalImageColor;
+				ctCaptionClr1 = HoverColor;
+				captionCnt1 = InteractionContent;
+				captionClick1 = ClickEvent;
+			}
+			else if (!allowCaption2)
+			{
+				allowCaption2 = true;
+				ctCaptionClr2_Orig = OriginalImageColor;
+				ctCaptionClr2 = HoverColor;
+				captionCnt2 = InteractionContent;
+				captionClick2 = ClickEvent;
+			}
+			else if (allowCaption1 && allowCaption2)
+				throw new InvalidOperationException("Cannot add another caption button to the form header because only 2 custom caption buttons maximum are supported.");
+		}
+
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
@@ -167,7 +212,9 @@ namespace CometUI
 				Cursor = Cursors.SizeNESW;
 			else if (close.Contains(e.Location) ||
 				(minimize.Contains(e.Location) && MinimizeBox) ||
-				(MinimizeBox && MaximizeBox && maximize.Contains(e.Location) && canResize))
+				(MinimizeBox && MaximizeBox && maximize.Contains(e.Location) && canResize) ||
+				(ctCaption1.Contains(e.Location) && allowCaption1) ||
+				(ctCaption2.Contains(e.Location) && allowCaption2))
 				Cursor = hand;
 			else Cursor = Cursors.Default;
 
@@ -188,6 +235,10 @@ namespace CometUI
 				else if (WindowState == FormWindowState.Normal)
 					WindowState = FormWindowState.Maximized;
 			}
+			else if (allowCaption1 && ctCaption1.Contains(e.Location))
+				captionClick1.Invoke(this, e);
+			else if (allowCaption2 && ctCaption2.Contains(e.Location))
+				captionClick2.Invoke(this, e);
 			else if (left.Contains(e.Location) && canResize)
 			{
 				ReleaseCapture();
@@ -229,13 +280,15 @@ namespace CometUI
 				SendMessage(Handle, 161, 17, 0);
 			}
 			else if (resizeBorder <= e.X && e.X <= Width - (resizeBorder * 2) - close.Width -
-				(MinimizeBox ? (MaximizeBox ? maximize.Width : 0) + minimize.Width : 0) &&
+				(MinimizeBox ? (MaximizeBox ? maximize.Width : 0) + minimize.Width : 0) -
+				(allowCaption1 ? headerHeight : 0) - (allowCaption2 ? headerHeight : 0) &&
 				resizeBorder <= e.Y && e.Y <= headerHeight + (resizeBorder * 2) && canResize)
 			{
 				ReleaseCapture();
 				SendMessage(Handle, 161, 2, 0);
 			}
-			else if (0 <= e.X && e.X <= Width - close.Width - (MinimizeBox ? minimize.Width : 0) &&
+			else if (0 <= e.X && e.X <= Width - close.Width - (MinimizeBox ? minimize.Width : 0) -
+					(allowCaption1 ? headerHeight : 0) - (allowCaption2 ? headerHeight : 0) &&
 					0 <= e.Y && e.Y <= headerHeight + (resizeBorder * 2))
 			{
 				ReleaseCapture();
@@ -294,6 +347,8 @@ namespace CometUI
 			}
 			if (MinimizeBox) text.Width -= headerHeight;
 			if (MaximizeBox && canResize) text.Width -= headerHeight;
+			if (allowCaption1) text.Width -= headerHeight;
+			if (allowCaption2) text.Width -= headerHeight;
 
 			if (ShowIcon)
 				e.Graphics.DrawIcon(Icon, new Rectangle(resizeBorder, resizeBorder, headerHeight, headerHeight + 1));
@@ -375,6 +430,46 @@ namespace CometUI
 				e.Graphics.DrawLine(new Pen(minimize.Contains(mouse) ? minimizeColor : ForeColor, 1.0f),
 					new Point(minimize.X + 6, minimize.Y + (minimize.Width / 2) + 1),
 					new Point(minimize.X + minimize.Width - 6, minimize.Y + (minimize.Width / 2) + 1));
+
+				if (allowCaption1)
+				{
+					ctCaption1 = new Rectangle(minimize.X - headerHeight, minimize.Y, headerHeight, headerHeight);
+
+					ImageAttributes imageAttr = new ImageAttributes();
+					ColorMap[] remapTable =
+					{
+						new ColorMap
+						{
+							OldColor = ctCaptionClr1_Orig,
+							NewColor = ctCaption1.Contains(mouse) ? ctCaptionClr1 : ForeColor,
+						},
+					};
+
+					imageAttr.SetRemapTable(remapTable);
+					e.Graphics.DrawImage(captionCnt1,
+						new Rectangle(ctCaption1.X + 2, ctCaption1.Y + 2, ctCaption1.Width - 4, ctCaption1.Height - 4),
+						0, 0, captionCnt1.Width, captionCnt1.Height, GraphicsUnit.Pixel, imageAttr);
+				}
+
+				if (allowCaption2)
+				{
+					ctCaption2 = new Rectangle(ctCaption1.X - headerHeight, ctCaption1.Y, headerHeight, headerHeight);
+
+					ImageAttributes imageAttr = new ImageAttributes();
+					ColorMap[] remapTable =
+					{
+						new ColorMap
+						{
+							OldColor = ctCaptionClr2_Orig,
+							NewColor = ctCaption2.Contains(mouse) ? ctCaptionClr2 : ForeColor,
+						},
+					};
+
+					imageAttr.SetRemapTable(remapTable);
+					e.Graphics.DrawImage(captionCnt2,
+						new Rectangle(ctCaption2.X + 2, ctCaption2.Y + 2, ctCaption2.Width - 4, ctCaption2.Height - 4),
+						0, 0, captionCnt2.Width, captionCnt2.Height, GraphicsUnit.Pixel, imageAttr);
+				}
 			}
 		}
 
