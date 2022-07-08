@@ -39,6 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorHelper.cs" />
+    <Compile Include="CometActionLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometButton.cs">
       <SubType>Component</SubType>
     </Compile>

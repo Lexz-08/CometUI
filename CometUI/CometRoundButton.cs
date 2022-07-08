@@ -101,7 +101,7 @@ namespace CometUI
 			e.Graphics.TextContrast = 0;
 
 			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-			GraphicsPath path = RoundRect.Roundify(0, 0, Width - 1, Height - 1, radius, false);
+			GraphicsPath path = RoundRect.Roundify(0, 0, Width - 1, Height - 1, radius);
 			e.Graphics.FillPath(new SolidBrush(background), path);
 
 			byte brightness = background.Brightness();

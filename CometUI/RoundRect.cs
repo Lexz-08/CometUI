@@ -5,18 +5,18 @@ namespace CometUI
 {
 	internal static class RoundRect
 	{
-		public static GraphicsPath Roundify(int x, int y, int w, int h, int radius, bool outline)
+		public static GraphicsPath Roundify(int x, int y, int w, int h, int radius)
 		{
-			return Roundify(new Rectangle(x, y, w, h), radius, outline);
+			return Roundify(new Rectangle(x, y, w, h), radius);
 		}
 
-		private static GraphicsPath Roundify(Rectangle rect, int radius, bool outline)
+		private static GraphicsPath Roundify(Rectangle rect, int radius)
 		{
 			GraphicsPath path = new GraphicsPath();
 			radius *= 2;
 
 			path.StartFigure();
-			path.AddArc(rect.X, rect.X, radius / (outline ? 1.1f : 1.05f), radius / (outline ? 1.1f : 1.05f), 180, 90);
+			path.AddArc(rect.X, rect.X, radius, radius, 180, 90);
 			path.AddArc(rect.X + rect.Width - radius, rect.Y, radius, radius, 270, 90);
 			path.AddArc(rect.X + rect.Width - radius, rect.Y + rect.Height - radius, radius, radius, 0, 90);
 			path.AddArc(rect.X, rect.Y + rect.Height - radius, radius, radius, 90, 90);
