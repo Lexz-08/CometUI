@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace CometUI
@@ -8,9 +9,9 @@ namespace CometUI
 	{
 		private Color tabColor = Color.FromArgb(100, 100, 100);
 		private bool underlineTab = false;
-		private Color background = Color.FromArgb(25, 25, 25);
-		private Color foreground = Color.FromArgb(230, 230, 230);
-		private Color unselectedForeground = Color.FromArgb(200, 200, 200);
+		private Color backColor = Color.FromArgb(25, 25, 25);
+		private Color foreColor = Color.FromArgb(230, 230, 230);
+		private Color unselectedForeColor = Color.FromArgb(200, 200, 200);
 
 		/// <summary>
 		/// The color used to draw the tabs.
@@ -33,33 +34,33 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// Replaces the <b>BackColor</b> property.
+		/// The background color of the control.
 		/// </summary>
-		[Description("Replaces the BackColor property.")]
+		[Description("The background color of the control.")]
 		public Color Background
 		{
-			get { return background; }
-			set { background = value; Invalidate(); }
+			get { return backColor; }
+			set { backColor = value; OnBackColorChanged(null); Invalidate(); }
 		}
 
 		/// <summary>
-		/// Replaces the <b>ForeColor</b> property.
+		/// The foreground color of the tab(s) (the tab's' text color).
 		/// </summary>
-		[Description("Replaces the ForeColor property.")]
+		[Description("The foreground color of the tab(s) (the tab's' text color).")]
 		public Color Foreground
 		{
-			get { return foreground; }
-			set { foreground = value; Invalidate(); }
+			get { return foreColor; }
+			set { foreColor = value; OnForeColorChanged(null); Invalidate(); }
 		}
 
 		/// <summary>
 		/// The color used to draw tab-text for unselected tabs.
 		/// </summary>
 		[Description("The color used to draw tab-text for unselected tabs.")]
-		public Color UnselectedForeground
+		public Color UnselectedForeColor
 		{
-			get { return unselectedForeground; }
-			set { unselectedForeground = value; Invalidate(); }
+			get { return unselectedForeColor; }
+			set { unselectedForeColor = value; Invalidate(); }
 		}
 
 		public CometTabControl()
@@ -72,8 +73,8 @@ namespace CometUI
 			DoubleBuffered = true;
 
 			Font = new Font("Segoe UI", 10.0f);
-			BackColor = Color.FromArgb(25, 25, 25);
-			ForeColor = Color.FromArgb(200, 200, 200);
+			backColor = Color.FromArgb(25, 25, 25);
+			foreColor = Color.FromArgb(230, 230, 230);
 
 			ItemSize = new Size(120, 30);
 		}
@@ -82,7 +83,10 @@ namespace CometUI
 		{
 			base.OnPaint(e);
 
-			e.Graphics.Clear(background);
+			e.Graphics.Clear(backColor);
+
+			e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+			e.Graphics.TextContrast = 0;
 
 			for (int i = 0; i < TabCount; i++)
 			{
@@ -97,11 +101,11 @@ namespace CometUI
 				else
 				{
 					if (underlineTab)
-						e.Graphics.FillRectangle(new SolidBrush(background), tab.X + 2, tab.Height - 2, tab.Width - 4, 2);
-					else e.Graphics.FillRectangle(new SolidBrush(background), tab.X + 2, tab.Y, tab.Width - 4, tab.Height);
+						e.Graphics.FillRectangle(new SolidBrush(backColor), tab.X + 2, tab.Height - 2, tab.Width - 4, 2);
+					else e.Graphics.FillRectangle(new SolidBrush(backColor), tab.X + 2, tab.Y, tab.Width - 4, tab.Height);
 				}
 
-				e.Graphics.DrawString(TabPages[i].Text, Font, new SolidBrush(i == SelectedIndex ? foreground : unselectedForeground),
+				e.Graphics.DrawString(TabPages[i].Text, Font, new SolidBrush(i == SelectedIndex ? foreColor : unselectedForeColor),
 					new Rectangle(tab.X + 2, tab.Y + (underlineTab ? -1 : 0), tab.Width - 4, tab.Height),
 					new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 			}
