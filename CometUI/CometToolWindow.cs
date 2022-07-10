@@ -10,15 +10,13 @@ using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometForm : Form
+	public class CometToolWindow : Form
 	{
 		private Color headerColor = Color.FromArgb(50, 50, 50);
 		private Color closeColor = Color.Red;
-		private Color minimizeColor = Color.Green;
-		private Color maximizeColor = Color.CornflowerBlue;
 		private bool canResize = true;
 		private bool useWinDropShadow = true;
-		
+
 		/// <summary>
 		/// The background color for the form's header.
 		/// </summary>
@@ -40,41 +38,13 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// The foreground color for the form's minimize button.
-		/// </summary>
-		[Description("The foreground color for the form's minimize button.")]
-		public Color MinimizeColor
-		{
-			get { return minimizeColor; }
-			set { minimizeColor = value; Invalidate(); }
-		}
-
-		/// <summary>
-		/// The foreground color for the form's maximize button.
-		/// </summary>
-		[Description("The foreground color for the form's maximize button.")]
-		public Color MaximizeColor
-		{
-			get { return maximizeColor; }
-			set { maximizeColor = value; Invalidate(); }
-		}
-
-		/// <summary>
 		/// Determines whether or not the form can be resized via the mouse cursor at runtime.
 		/// </summary>
 		[Description("Determines whether or not the form can be resized via the mouse cursor at runtime.")]
 		public bool CanResize
 		{
 			get { return canResize; }
-			set
-			{
-				canResize = value;
-
-				if (!canResize)
-					MaximizeBox = false;
-
-				Invalidate();
-			}
+			set { canResize = value; Invalidate(); }
 		}
 
 		/// <summary>
@@ -96,22 +66,23 @@ namespace CometUI
 			set { base.FormBorderStyle = value; Invalidate(); }
 		}
 
-		/// <summary>
-		/// Occurs when the form's window state changes.
-		/// </summary>
-		[Description("Occurs when the form's window state changes.")]
-		public event EventHandler WindowStateChanged;
-
-		/// <summary>
-		/// Raises the <see cref="WindowStateChanged"/> event.
-		/// </summary>
-		protected void OnWindowStateChanged(EventArgs e)
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+		public new bool MaximizeBox
 		{
-			WindowStateChanged?.Invoke(this, e);
-			Invalidate();
+			get { return base.MaximizeBox; }
+			set { base.MaximizeBox = value; Invalidate(); }
 		}
 
-		public CometForm()
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+		public new bool MinimizeBox
+		{
+			get { return base.MinimizeBox; }
+			set { base.MinimizeBox = value; Invalidate(); }
+		}
+
+		public CometToolWindow()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
@@ -129,7 +100,7 @@ namespace CometUI
 
 		private Rectangle left, topLeft, bottomLeft,
 			right, topRight, bottomRight,
-			top, bottom, close, minimize, maximize;
+			top, bottom, close;
 
 		private Rectangle ctCaption1, ctCaption2;
 		private Color ctCaptionClr1, ctCaptionClr2;
@@ -213,8 +184,6 @@ namespace CometUI
 			else if ((topRight.Contains(e.Location) || bottomLeft.Contains(e.Location)) && canResize)
 				Cursor = Cursors.SizeNESW;
 			else if (close.Contains(e.Location) ||
-				(minimize.Contains(e.Location) && MinimizeBox) ||
-				(MinimizeBox && MaximizeBox && maximize.Contains(e.Location) && canResize) ||
 				(ctCaption1.Contains(e.Location) && allowCaption1) ||
 				(ctCaption2.Contains(e.Location) && allowCaption2))
 				Cursor = hand;
@@ -228,15 +197,6 @@ namespace CometUI
 
 			if (close.Contains(e.Location))
 				Close();
-			else if (minimize.Contains(e.Location) && MinimizeBox)
-				WindowState = FormWindowState.Minimized;
-			else if (maximize.Contains(e.Location) && MinimizeBox && MaximizeBox && canResize)
-			{
-				if (WindowState == FormWindowState.Maximized)
-					WindowState = FormWindowState.Normal;
-				else if (WindowState == FormWindowState.Normal)
-					WindowState = FormWindowState.Maximized;
-			}
 			else if (allowCaption1 && ctCaption1.Contains(e.Location))
 				captionClick1.Invoke(this, e);
 			else if (allowCaption2 && ctCaption2.Contains(e.Location))
@@ -282,14 +242,13 @@ namespace CometUI
 				SendMessage(Handle, 161, 17, 0);
 			}
 			else if (resizeBorder <= e.X && e.X <= Width - (resizeBorder * 2) - close.Width -
-				(MinimizeBox ? (MaximizeBox ? maximize.Width : 0) + minimize.Width : 0) -
 				(allowCaption1 ? headerHeight : 0) - (allowCaption2 ? headerHeight : 0) &&
 				resizeBorder <= e.Y && e.Y <= headerHeight + (resizeBorder * 2) && canResize)
 			{
 				ReleaseCapture();
 				SendMessage(Handle, 161, 2, 0);
 			}
-			else if (0 <= e.X && e.X <= Width - close.Width - (MinimizeBox ? minimize.Width : 0) -
+			else if (0 <= e.X && e.X <= Width - close.Width -
 					(allowCaption1 ? headerHeight : 0) - (allowCaption2 ? headerHeight : 0) &&
 					0 <= e.Y && e.Y <= headerHeight + (resizeBorder * 2))
 			{
@@ -347,8 +306,6 @@ namespace CometUI
 				text.X += headerHeight + 2;
 				text.Width -= headerHeight;
 			}
-			if (MinimizeBox) text.Width -= headerHeight;
-			if (MaximizeBox && canResize) text.Width -= headerHeight;
 			if (allowCaption1) text.Width -= headerHeight;
 			if (allowCaption2) text.Width -= headerHeight;
 
@@ -375,71 +332,13 @@ namespace CometUI
 				new Point(close.X + close.Width - 6, close.Y + 6),
 				new Point(close.X + 6, close.Y + close.Height - 6));
 
-			if (MinimizeBox)
+			if (allowCaption1)
 			{
-				minimize = new Rectangle(close.X - headerHeight, close.Y, headerHeight, headerHeight);
+				ctCaption1 = new Rectangle(close.X - headerHeight, close.Y, headerHeight, headerHeight);
 
-				if (MaximizeBox && canResize)
+				ImageAttributes imageAttr = new ImageAttributes();
+				ColorMap[] remapTable =
 				{
-					maximize = new Rectangle(close.X - headerHeight, minimize.Y, headerHeight, headerHeight);
-					minimize = new Rectangle(maximize.X - headerHeight, maximize.Y, headerHeight, headerHeight);
-
-					if (WindowState == FormWindowState.Maximized)
-					{
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 6, maximize.Y + 8),
-							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6),
-							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 6),
-							new Point(maximize.X + maximize.Width - 8, maximize.Y + 8));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 8, maximize.Y + 8),
-							new Point(maximize.X + 6, maximize.Y + 8));
-
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 8, maximize.Y + 8),
-							new Point(maximize.X + 8, maximize.Y + 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 8, maximize.Y + 6),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 8));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 8),
-							new Point(maximize.X + maximize.Width - 8, maximize.Y + maximize.Height - 8));
-					}
-					else if (WindowState == FormWindowState.Normal)
-					{
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 6, maximize.Y + 6),
-							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + 6, maximize.Y + maximize.Height - 6),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + maximize.Height - 6),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6));
-						e.Graphics.DrawLine(new Pen(maximize.Contains(mouse) ? maximizeColor : ForeColor, 1.0f),
-							new Point(maximize.X + maximize.Width - 6, maximize.Y + 6),
-							new Point(maximize.X + 6, maximize.Y + 6));
-					}
-				}
-
-				e.Graphics.DrawLine(new Pen(minimize.Contains(mouse) ? minimizeColor : ForeColor, 1.0f),
-					new Point(minimize.X + 6, minimize.Y + (minimize.Width / 2) + 1),
-					new Point(minimize.X + minimize.Width - 6, minimize.Y + (minimize.Width / 2) + 1));
-
-				if (allowCaption1)
-				{
-					ctCaption1 = new Rectangle(minimize.X - headerHeight, minimize.Y, headerHeight, headerHeight);
-
-					ImageAttributes imageAttr = new ImageAttributes();
-					ColorMap[] remapTable =
-					{
 						new ColorMap
 						{
 							OldColor = ctCaptionClr1_Orig,
@@ -447,19 +346,19 @@ namespace CometUI
 						},
 					};
 
-					imageAttr.SetRemapTable(remapTable);
-					e.Graphics.DrawImage(captionCnt1,
-						new Rectangle(ctCaption1.X + 2, ctCaption1.Y + 2, ctCaption1.Width - 4, ctCaption1.Height - 4),
-						0, 0, captionCnt1.Width, captionCnt1.Height, GraphicsUnit.Pixel, imageAttr);
-				}
+				imageAttr.SetRemapTable(remapTable);
+				e.Graphics.DrawImage(captionCnt1,
+					new Rectangle(ctCaption1.X + 2, ctCaption1.Y + 2, ctCaption1.Width - 4, ctCaption1.Height - 4),
+					0, 0, captionCnt1.Width, captionCnt1.Height, GraphicsUnit.Pixel, imageAttr);
+			}
 
-				if (allowCaption2)
+			if (allowCaption2)
+			{
+				ctCaption2 = new Rectangle(ctCaption1.X - headerHeight, ctCaption1.Y, headerHeight, headerHeight);
+
+				ImageAttributes imageAttr = new ImageAttributes();
+				ColorMap[] remapTable =
 				{
-					ctCaption2 = new Rectangle(ctCaption1.X - headerHeight, ctCaption1.Y, headerHeight, headerHeight);
-
-					ImageAttributes imageAttr = new ImageAttributes();
-					ColorMap[] remapTable =
-					{
 						new ColorMap
 						{
 							OldColor = ctCaptionClr2_Orig,
@@ -467,39 +366,11 @@ namespace CometUI
 						},
 					};
 
-					imageAttr.SetRemapTable(remapTable);
-					e.Graphics.DrawImage(captionCnt2,
-						new Rectangle(ctCaption2.X + 2, ctCaption2.Y + 2, ctCaption2.Width - 4, ctCaption2.Height - 4),
-						0, 0, captionCnt2.Width, captionCnt2.Height, GraphicsUnit.Pixel, imageAttr);
-				}
+				imageAttr.SetRemapTable(remapTable);
+				e.Graphics.DrawImage(captionCnt2,
+					new Rectangle(ctCaption2.X + 2, ctCaption2.Y + 2, ctCaption2.Width - 4, ctCaption2.Height - 4),
+					0, 0, captionCnt2.Width, captionCnt2.Height, GraphicsUnit.Pixel, imageAttr);
 			}
-		}
-
-		protected override void OnClientSizeChanged(EventArgs e)
-		{
-			base.OnClientSizeChanged(e);
-
-			switch (WindowState)
-			{
-				case FormWindowState.Maximized:
-				case FormWindowState.Minimized:
-				case FormWindowState.Normal:
-					OnWindowStateChanged(e);
-					break;
-			}
-		}
-
-		protected override void OnResizeEnd(EventArgs e)
-		{
-			base.OnResizeEnd(e);
-
-			int screenY = Screen.FromPoint(Location).Bounds.Location.Y;
-
-			bool wndSnap = Location.Y <= screenY + 10 && Location.Y >= screenY;
-			bool mouseSnap = MousePosition.Y <= screenY + 10 && MousePosition.Y >= screenY;
-
-			if (wndSnap || mouseSnap)
-				WindowState = FormWindowState.Maximized;
 		}
 
 		#region Custom Drop-Shadow

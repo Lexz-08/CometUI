@@ -94,6 +94,9 @@
     <Compile Include="CometTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometToolWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundRect.cs" />
   </ItemGroup>
