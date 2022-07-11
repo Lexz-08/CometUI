@@ -96,6 +96,14 @@ namespace CometUI
 			set { base.FormBorderStyle = value; Invalidate(); }
 		}
 
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+		public new bool DoubleBuffered
+		{
+			get { return base.DoubleBuffered; }
+			set { base.DoubleBuffered = value; Invalidate(); }
+		}
+
 		/// <summary>
 		/// Occurs when the form's window state changes.
 		/// </summary>
@@ -202,8 +210,6 @@ namespace CometUI
 		{
 			base.OnMouseMove(e);
 
-			Cursor hand = LoadFromRegistry("Hand") ?? Cursors.Hand;
-
 			if ((left.Contains(e.Location) || right.Contains(e.Location)) && canResize)
 				Cursor = Cursors.SizeWE;
 			else if ((top.Contains(e.Location) || bottom.Contains(e.Location)) && canResize)
@@ -217,9 +223,10 @@ namespace CometUI
 				(MinimizeBox && MaximizeBox && maximize.Contains(e.Location) && canResize) ||
 				(ctCaption1.Contains(e.Location) && allowCaption1) ||
 				(ctCaption2.Contains(e.Location) && allowCaption2))
-				Cursor = hand;
+				Cursor = LoadFromRegistry("Hand") ?? Cursors.Hand;
 			else Cursor = Cursors.Default;
 
+			GC.Collect();
 			Invalidate();
 		}
 		protected override void OnMouseDown(MouseEventArgs e)
