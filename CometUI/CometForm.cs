@@ -502,8 +502,8 @@ namespace CometUI
 
 			int screenY = Screen.FromPoint(Location).Bounds.Location.Y;
 
-			bool wndSnap = Location.Y <= screenY + 10 && Location.Y >= screenY;
-			bool mouseSnap = MousePosition.Y <= screenY + 10 && MousePosition.Y >= screenY;
+			bool wndSnap = Location.Y <= screenY + 2 && Location.Y >= screenY;
+			bool mouseSnap = MousePosition.Y <= screenY + 2 && MousePosition.Y >= screenY;
 
 			if (wndSnap || mouseSnap)
 				WindowState = FormWindowState.Maximized;
