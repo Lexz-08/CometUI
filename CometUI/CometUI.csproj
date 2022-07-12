@@ -46,6 +46,12 @@
     <Compile Include="CometCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometFlatButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CometFlatGradientButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometFolderInput.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -72,6 +78,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CometRoundButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CometRoundFlatButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CometRoundFlatGradientButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CometRoundGradientButton.cs">

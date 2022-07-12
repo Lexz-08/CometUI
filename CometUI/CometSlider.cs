@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace CometUI
@@ -16,6 +17,8 @@ namespace CometUI
 		private Color trackOutlineColor = Color.FromArgb(50, 50, 50);
 		private Color knobColor = Color.FromArgb(70, 70, 70);
 		private Color dragColor = Color.FromArgb(60, 60, 60);
+		private Color valueTextColor = Color.FromArgb(200, 200, 200);
+		private bool showValue = false;
 
 		/// <summary>
 		/// The current value of the slider control.
@@ -114,6 +117,26 @@ namespace CometUI
 		{
 			get { return dragColor; }
 			set { dragColor = value; Invalidate(); }
+		}
+
+		/// <summary>
+		/// The foreground color of the value displayed on the slider knob (only if '<see cref="ShowSliderValue"/>' is set to '<see langword="true"/>').
+		/// </summary>
+		[Description("The foreground color of the value displayed on the slider knob (only if 'ShowSliderValue' is set to 'true').")]
+		public Color ValueTextColor
+		{
+			get { return valueTextColor; }
+			set { valueTextColor = value; Invalidate(); }
+		}
+
+		/// <summary>
+		/// Determines whether or not the value of the slider will be drawn to the slider knob.
+		/// </summary>
+		[Description("Determines whether or not the value of the slider will be drawn to the slider knob.")]
+		public bool ShowSliderValue
+		{
+			get { return showValue; }
+			set { showValue = value; Invalidate(); }
 		}
 
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -302,6 +325,16 @@ namespace CometUI
 			e.Graphics.DrawPath(new Pen(trackOutlineColor, 2.0f), trackPath);
 			e.Graphics.FillEllipse(new SolidBrush(canDrag ? dragColor : knobColor), knob.X - (knob.Width / 2), knob.Y - 1, knob.Width, knob.Height);
 			e.Graphics.SmoothingMode = SmoothingMode.None;
+
+			if (showValue)
+			{
+				e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+				e.Graphics.TextContrast = 0;
+
+				e.Graphics.DrawString(value.ToString(), new Font(Font.Name, knob.Height / 3), new SolidBrush(valueTextColor),
+					new Rectangle(knob.X - (knob.Width / 2), knob.Y + (knob.Height % 2 == 0 ? 0 : 1), knob.Width, knob.Height),
+					new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+			}
 		}
 	}
 }
