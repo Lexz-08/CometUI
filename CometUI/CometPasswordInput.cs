@@ -11,7 +11,7 @@ namespace CometUI
 		private Color focusedBorderColor = Color.DodgerBlue;
 		private Color currentBorderColor = Color.FromArgb(70, 70, 70);
 		private bool underlineBorder = false;
-		private TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
+		private readonly TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
 
 		/// <summary>
 		/// The background color of the textbox border.

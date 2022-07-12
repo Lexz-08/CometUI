@@ -18,7 +18,7 @@ namespace CometUI
 		private bool underlineBorder = false;
 		private string dialogTitle = "Please choose a folder...";
 		private Environment.SpecialFolder rootFolder = Environment.SpecialFolder.Desktop;
-		private TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
+		private readonly TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
 
 		/// <summary>
 		/// The background color of the textbox border.
@@ -325,10 +325,11 @@ namespace CometUI
 			Bitmap chooserBmp = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream("CometUI.Images.file-chooser.png"));
 
 			ImageAttributes imageAttr = new ImageAttributes();
-			ColorMap clrMap = new ColorMap();
-
-			clrMap.OldColor = Color.Black;
-			clrMap.NewColor = file.Contains(PointToClient(MousePosition)) ? fileChooserColor : borderColor;
+			ColorMap clrMap = new ColorMap
+			{
+				OldColor = Color.Black,
+				NewColor = file.Contains(PointToClient(MousePosition)) ? fileChooserColor : borderColor,
+			};
 
 			ColorMap[] remapeTable = { clrMap };
 			imageAttr.SetRemapTable(remapeTable, ColorAdjustType.Bitmap);

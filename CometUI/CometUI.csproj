@@ -32,10 +32,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorHelper.cs" />
@@ -52,12 +50,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CometFileInputType.cs" />
-    <Compile Include="CometLogConsole.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CometLogConsole.Designer.cs">
-      <DependentUpon>CometLogConsole.cs</DependentUpon>
-    </Compile>
     <Compile Include="CometForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +77,9 @@
     <Compile Include="CometRoundGradientButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometSlider.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -99,11 +94,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundRect.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CometLogConsole.resx">
-      <DependentUpon>CometLogConsole.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\file-chooser.png" />

@@ -126,8 +126,10 @@ namespace CometUI
 
 			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 			LinearGradientBrush lgb = new LinearGradientBrush(new Rectangle(0, 0, Width, Height), gradientColor1, gradientColor2, gradientAngle);
-			GraphicsPath path = RoundRect.Roundify(0, 0, Width - 1, Height - 1, radius);
+			GraphicsPath path = RoundRect.Roundify(1, 1, Width - 3, Height - 3, radius);
+			GraphicsPath outline = RoundRect.Roundify(1, 1, Width - 3, Height - 3, radius);
 			e.Graphics.FillPath(lgb, path);
+			e.Graphics.DrawPath(new Pen(lgb, 2.0f), outline);
 
 			byte brightness = (byte)((gradientColor1.Brightness() + gradientColor2.Brightness()) / 2);
 

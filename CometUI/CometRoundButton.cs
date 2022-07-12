@@ -101,26 +101,40 @@ namespace CometUI
 			e.Graphics.TextContrast = 0;
 
 			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-			GraphicsPath path = RoundRect.Roundify(0, 0, Width - 1, Height - 1, radius);
+			GraphicsPath path = RoundRect.Roundify(2, 2, Width - 5, Height - 5, radius - 1);
+			GraphicsPath outline = RoundRect.Roundify(1, 1, Width - 3, Height - 3, radius);
 			e.Graphics.FillPath(new SolidBrush(background), path);
+			e.Graphics.DrawPath(new Pen(background, 2.0f), outline);
 
 			byte brightness = background.Brightness();
 
 			if (brightness > 127)
 			{
 				if (mouseOver)
+				{
 					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(20, Color.Black)), path);
+					e.Graphics.DrawPath(new Pen(Color.FromArgb(20, Color.Black), 2.0f), outline);
+				}
 
 				if (mouseDown)
+				{
 					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(60, Color.White)), path);
+					e.Graphics.DrawPath(new Pen(Color.FromArgb(60, Color.White), 2.0f), outline);
+				}
 			}
 			else if (brightness <= 127)
 			{
 				if (mouseOver)
+				{
 					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(60, Color.White)), path);
+					e.Graphics.DrawPath(new Pen(Color.FromArgb(60, Color.White), 2.0f), outline);
+				}
 
 				if (mouseDown)
+				{
 					e.Graphics.FillPath(new SolidBrush(Color.FromArgb(40, Color.Black)), path);
+					e.Graphics.DrawPath(new Pen(Color.FromArgb(40, Color.Black), 2.0f), outline);
+				}
 			}
 
 			e.Graphics.SmoothingMode = SmoothingMode.None;
