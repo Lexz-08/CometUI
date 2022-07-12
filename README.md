@@ -2,9 +2,9 @@
 ## Description
 A basic Windows Forms UI kit for simple UI creation.
 
-## Version Information
-| Version                                                                             | Control             |
-|-------------------------------------------------------------------------------------|---------------------|
+## UI Information
+| Version                                                                                     | Control             |
+|---------------------------------------------------------------------------------------------|---------------------|
 | [1.0.3.3^](https://github.com/Lexz-08/CometUI/releases/download/1.0.3.3/CometUI.dll)        | ActionLabel         |
 | [1.0.0^](https://github.com/Lexz-08/CometUI/releases/download/1.0.0/CometUI.dll)            | Button              |
 | [1.0.0^](https://github.com/Lexz-08/CometUI/releases/download/1.0.0/CometUI.dll)            | CheckBox            |
