@@ -101,6 +101,9 @@
     <Compile Include="CometTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometToggle.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometToolWindow.cs">
       <SubType>Form</SubType>
     </Compile>
