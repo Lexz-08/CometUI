@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometSlider : Control
+	public class CometVerticalSlider : Control
 	{
 		private int value = 50;
 		private int defValue = 50;
@@ -170,7 +170,7 @@ namespace CometUI
 			Invalidate();
 		}
 
-		public CometSlider()
+		public CometVerticalSlider()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
@@ -179,14 +179,14 @@ namespace CometUI
 					ControlStyles.SupportsTransparentBackColor, true);
 			DoubleBuffered = true;
 
-			Size = new Size(200, 16);
+			Size = new Size(16, 200);
 			Cursor = Cursors.Hand;
 
-			knob = new Rectangle(Width / 2, 0, 16, 16);
+			knob = new Rectangle(0, Height / 2, 16, 16);
 		}
 
 		private bool canDrag = false;
-		private int offX = 0;
+		private int offY = 0;
 
 		private Rectangle knob;
 
@@ -204,10 +204,10 @@ namespace CometUI
 
 		private void CalculateValue(MouseEventArgs e)
 		{
-			knob.X = Math.Max(Height / 2, Math.Min(e.X - offX, Width - (Height / 2) - 1));
-			double width = Width - Height;
-			double knobX = knob.X - (Height / 2);
-			double percent = knobX / width;
+			knob.Y = Math.Max(Width / 2, Math.Min(e.Y - offY, Height - (Width / 2) - 1));
+			double height = Height - Width;
+			double knobY = knob.Y - (Width / 2);
+			double percent = knobY / height;
 
 			value = (int)Math.Round((percent * (maximum - minimum)) + minimum, 0);
 
@@ -217,10 +217,10 @@ namespace CometUI
 
 		private void CalculateKnobPosition()
 		{
-			double width = Width - Height;
+			double height = Height - Width;
 			double num = value - minimum;
 			double den = maximum - minimum;
-			knob.X = Math.Max((Height / 2) + 1, Math.Min((int)((num / den * width) + (Height / 2)), Width - (Height / 2) - 1));
+			knob.Y = Math.Max((Width  / 2) + 1, Math.Min((int)((num / den * height) + (Width/ 2)), Height - (Width / 2) - 1));
 
 			Invalidate();
 		}
@@ -229,8 +229,8 @@ namespace CometUI
 		{
 			base.OnResize(e);
 
-			knob.Height = Height;
-			knob.Width = knob.Height;
+			knob.Width = Width;
+			knob.Height = knob.Width;
 
 			CalculateKnobPosition();
 			Invalidate();
@@ -246,16 +246,16 @@ namespace CometUI
 			base.OnMouseDown(e);
 
 			canDrag = true;
-			offX = e.X - knob.X;
+			offY = e.Y - knob.Y;
 
-			int cX = knob.X;
-			int cY = knob.Y + (knob.Height / 2);
-			int radius = Height / 2;
+			int cX = knob.X + (knob.Width / 2);
+			int cY = knob.Y;
+			int radius = Width / 2;
 
-			if (!(Math.Pow(e.X - cX, 2) + Math.Pow(e.Y - cY, 2) <= Math.Pow(radius, 2))) // knob.X + (knob.Width / 2) < e.X || knob.X - (knob.Width / 2) > e.X
+			if (!(Math.Pow(e.X - cX, 2) + Math.Pow(e.Y - cY, 2) <= Math.Pow(radius, 2))) // knob.Y + (knob.Height / 2) < e.Y || knob.Y - (knob.Height / 2) > e.Y
 			{
-				offX = 0;
-				knob.X = e.X - offX;
+				offY = 0;
+				knob.Y = e.Y - offY;
 			}
 
 			CalculateValue(e);
@@ -266,7 +266,7 @@ namespace CometUI
 			base.OnMouseUp(e);
 
 			canDrag = false;
-			offX = 0;
+			offY = 0;
 			Invalidate();
 		}
 
@@ -287,7 +287,7 @@ namespace CometUI
 		{
 			base.OnPaint(e);
 
-			Rectangle track = new Rectangle((Height / 2) - 1, (Height / 4) - 1, Width - Height, (Height / 2) + 1);
+			Rectangle track = new Rectangle((Width / 4) - 1, (Width / 2) - 1, (Width / 2) + 1, Height - Width);
 
 			int radius = Math.Min(Width, Height) / 2;
 			GraphicsPath trackPath = new GraphicsPath();
@@ -301,7 +301,7 @@ namespace CometUI
 			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 			e.Graphics.FillPath(new SolidBrush(trackColor), trackPath);
 			e.Graphics.DrawPath(new Pen(trackOutlineColor, 2.0f), trackPath);
-			e.Graphics.FillEllipse(new SolidBrush(canDrag ? dragColor : knobColor), knob.X - (knob.Width / 2), knob.Y - 1, knob.Width, knob.Height);
+			e.Graphics.FillEllipse(new SolidBrush(canDrag ? dragColor : knobColor), knob.X - 1, knob.Y - (knob.Height / 2), knob.Width, knob.Height);
 			e.Graphics.SmoothingMode = SmoothingMode.None;
 
 			if (showValue)
@@ -310,7 +310,7 @@ namespace CometUI
 				e.Graphics.TextContrast = 0;
 
 				e.Graphics.DrawString(value.ToString(), new Font(Font.Name, (float)(knob.Height / 2.6f)), new SolidBrush(valueTextColor),
-					new Rectangle(knob.X - (knob.Width / 2), knob.Y + (knob.Height % 2 == 0 ? 0 : 1), knob.Width, knob.Height),
+					new Rectangle(knob.X - 1, knob.Y - (knob.Height / 2) + (knob.Height % 2 == 0 ? 0 : 1), knob.Width, knob.Height),
 					new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 			}
 		}

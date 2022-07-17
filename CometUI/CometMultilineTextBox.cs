@@ -5,13 +5,13 @@ using System.Windows.Forms;
 
 namespace CometUI
 {
-	public class CometPasswordInput : Control
+	public class CometMultilineTextBox : Control
 	{
 		private Color borderColor = Color.FromArgb(70, 70, 70);
 		private Color focusedBorderColor = Color.DodgerBlue;
 		private Color currentBorderColor = Color.FromArgb(70, 70, 70);
 		private bool underlineBorder = false;
-		private readonly TextBox internalTextBox = new TextBox { BorderStyle = BorderStyle.None };
+		private readonly RichTextBox internalTextBox = new RichTextBox { BorderStyle = BorderStyle.None };
 
 		/// <summary>
 		/// The background color of the textbox border.
@@ -20,13 +20,7 @@ namespace CometUI
 		public Color BorderColor
 		{
 			get { return borderColor; }
-			set
-			{
-				borderColor = value;
-				if (!internalTextBox.Focused)
-					currentBorderColor = value;
-				Invalidate();
-			}
+			set { borderColor = value; Invalidate(); }
 		}
 
 		/// <summary>
@@ -36,13 +30,7 @@ namespace CometUI
 		public Color FocusedBorderColor
 		{
 			get { return focusedBorderColor; }
-			set 
-			{ 
-				focusedBorderColor = value;
-				if (internalTextBox.Focused)
-					currentBorderColor = value;
-				Invalidate(); 
-			}
+			set { focusedBorderColor = value; Invalidate(); }
 		}
 
 		/// <summary>
@@ -97,7 +85,6 @@ namespace CometUI
 			set
 			{
 				internalTextBox.Font = base.Font = value;
-				UpdateHeight();
 				internalTextBox.Invalidate();
 				Invalidate();
 				OnFontChanged(null);
@@ -105,7 +92,7 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// The text displayed in the textbox.
+		/// The text displaying in the textbox.
 		/// </summary>
 		[Description("The text displayed in the textbox.")]
 		public override string Text
@@ -146,11 +133,11 @@ namespace CometUI
 		}
 
 		/// <summary>
-		/// Indicates whether or not the control is currently focused with keyboard input.
+		/// Indicates whether or not the control is currently focused with the keyboard input.
 		/// </summary>
 		public override bool Focused => internalTextBox.Focused;
 
-		public CometPasswordInput()
+		public CometMultilineTextBox()
 		{
 			SetStyle(ControlStyles.AllPaintingInWmPaint |
 					ControlStyles.UserPaint |
@@ -161,14 +148,14 @@ namespace CometUI
 			Font = new Font("Segoe UI", 10.0f);
 			BackColor = Color.FromArgb(25, 25, 25);
 			ForeColor = Color.FromArgb(200, 200, 200);
-			Width = 200;
+			Size = new Size(250, 225);
 
 			Cursor = Cursors.IBeam;
 
-			internalTextBox.Location = new Point(4, 3);
+			internalTextBox.Location = new Point(4, 4);
 			internalTextBox.Width = Width - 8;
+			internalTextBox.Height = Height - 8;
 			internalTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-			internalTextBox.UseSystemPasswordChar = true;
 
 			internalTextBox.GotFocus += (s, e) => UpdateBorderColor();
 			internalTextBox.LostFocus += (s, e) => { OnLostFocus(e); };
@@ -190,24 +177,6 @@ namespace CometUI
 			Invalidate();
 		}
 
-		private void UpdateHeight()
-		{
-			if (Height < internalTextBox.Height + 8)
-				Height = internalTextBox.Height + 8;
-		}
-
-		protected override void OnResize(EventArgs e)
-		{
-			base.OnResize(e);
-
-			UpdateHeight();
-		}
-		protected override void OnSizeChanged(EventArgs e)
-		{
-			base.OnSizeChanged(e);
-			base.OnResize(e);
-		}
-
 		protected override void OnGotFocus(EventArgs e)
 		{
 			base.OnGotFocus(e);
@@ -227,21 +196,21 @@ namespace CometUI
 			base.OnClick(e);
 
 			internalTextBox.Focus();
-			Invalidate();
+			UpdateBorderColor();
 		}
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
 			base.OnMouseClick(e);
 
 			internalTextBox.Focus();
-			Invalidate();
+			UpdateBorderColor();
 		}
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseDown(e);
 
 			internalTextBox.Focus();
-			Invalidate();
+			UpdateBorderColor();
 		}
 
 		protected override void OnPaint(PaintEventArgs e)

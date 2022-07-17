@@ -235,6 +235,9 @@ namespace CometUI
 			internalTextBox.LostFocus += (s, e) => { OnLostFocus(e); };
 
 			internalTextBox.TextChanged += (s, e) => OnTextChanged(e);
+			internalTextBox.KeyDown += (s, e) => OnKeyDown(e);
+			internalTextBox.KeyPress += (s, e) => OnKeyPress(e);
+			internalTextBox.KeyUp += (s, e) => OnKeyUp(e);
 
 			Controls.Add(internalTextBox);
 		}
