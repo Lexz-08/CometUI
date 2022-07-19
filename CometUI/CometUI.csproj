@@ -74,6 +74,9 @@
     <Compile Include="CometMultilineTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CometNumericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CometProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
