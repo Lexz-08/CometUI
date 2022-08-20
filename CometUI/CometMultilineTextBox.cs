@@ -20,7 +20,13 @@ namespace CometUI
 		public Color BorderColor
 		{
 			get { return borderColor; }
-			set { borderColor = value; Invalidate(); }
+			set
+			{
+				borderColor = value;
+				if (!internalTextBox.Focused)
+					currentBorderColor = value;
+				Invalidate();
+			}
 		}
 
 		/// <summary>
@@ -30,7 +36,13 @@ namespace CometUI
 		public Color FocusedBorderColor
 		{
 			get { return focusedBorderColor; }
-			set { focusedBorderColor = value; Invalidate(); }
+			set
+			{
+				focusedBorderColor = value;
+				if (internalTextBox.Focused)
+					currentBorderColor = value;
+				Invalidate();
+			}
 		}
 
 		/// <summary>
