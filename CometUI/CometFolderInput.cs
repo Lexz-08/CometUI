@@ -231,6 +231,16 @@ namespace CometUI
 				Height = internalTextBox.Height + 8;
 		}
 
+		/// <summary>
+		/// Sets the current directory path of the folder-input.
+		/// </summary>
+		/// <param name="DirectoryPath">The directory path to set in the input.</param>
+		public void SetFolder(string DirectoryPath)
+		{
+			internalTextBox.Text = DirectoryPath;
+			Invalidate();
+		}
+
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);

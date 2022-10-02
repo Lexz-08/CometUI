@@ -3,7 +3,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -260,6 +259,16 @@ namespace CometUI
 		{
 			if (Height < internalTextBox.Height + 8)
 				Height = internalTextBox.Height + 8;
+		}
+
+		/// <summary>
+		/// Sets the current file path of the file-input.
+		/// </summary>
+		/// <param name="FilePath">The file path to set in the input.</param>
+		public void SetFile(string FilePath)
+		{
+			internalTextBox.Text = FilePath;
+			Invalidate();
 		}
 
 		protected override void OnResize(EventArgs e)
