@@ -500,13 +500,20 @@ namespace CometUI
 		{
 			base.OnResizeEnd(e);
 
-			int screenY = Screen.FromPoint(Location).Bounds.Location.Y;
+			if (canResize)
+			{
+				int screenY = Screen.FromPoint(Location).Bounds.Location.Y;
+				int screenX = Screen.FromPoint(Location).Bounds.Location.X;
+				int screenX2 = Screen.FromPoint(Location).Bounds.Location.X + Screen.FromPoint(Location).Bounds.Size.Width;
 
-			bool wndSnap = Location.Y <= screenY + 2 && Location.Y >= screenY;
-			bool mouseSnap = MousePosition.Y <= screenY + 2 && MousePosition.Y >= screenY;
+				bool wndSnap = Location.Y <= screenY + 6 && Location.Y >= screenY;
+				bool mouseSnap = MousePosition.Y <= screenY + 6 && MousePosition.Y >= screenY;
 
-			if (wndSnap || mouseSnap)
-				WindowState = FormWindowState.Maximized;
+				if (wndSnap || mouseSnap)
+				{
+					WindowState = FormWindowState.Maximized;
+				}
+			}
 		}
 
 		#region Custom Drop-Shadow
