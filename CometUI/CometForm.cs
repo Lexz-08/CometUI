@@ -16,6 +16,7 @@ namespace CometUI
 		private Color closeColor = Color.Red;
 		private Color minimizeColor = Color.Green;
 		private Color maximizeColor = Color.CornflowerBlue;
+		private Color borderColor = Color.FromArgb(70, 70, 70);
 		private bool canResize = true;
 		private bool useWinDropShadow = true;
 		
@@ -57,6 +58,16 @@ namespace CometUI
 		{
 			get { return maximizeColor; }
 			set { maximizeColor = value; Invalidate(); }
+		}
+
+		/// <summary>
+		/// The background color for the form's border, if <see cref="UseWindowsDropShadow"/> is set to <see langword="false"/>.
+		/// </summary>
+		[Description("The background color for the form's border, if UseWindowsDropShadow is set to false..")]
+		public Color BorderColor
+		{
+			get { return borderColor; }
+			set { borderColor = value; Invalidate(); }
 		}
 
 		/// <summary>
@@ -336,8 +347,11 @@ namespace CometUI
 			e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 			e.Graphics.TextContrast = 0;
 
-			e.Graphics.FillRectangle(new SolidBrush(BackColor), 0, 0, Width, Height);
-			e.Graphics.FillRectangle(new SolidBrush(headerColor), 0, 0, Width, headerHeight + (resizeBorder * 2));
+			if (!useWinDropShadow) e.Graphics.FillRectangle(new SolidBrush(borderColor), 0, 0, Width, Height);
+			e.Graphics.FillRectangle(new SolidBrush(BackColor),
+				useWinDropShadow ? 0 : 1, useWinDropShadow ? 0 : 1, Width - (useWinDropShadow ? 0 : 2), Height - (useWinDropShadow ? 0 : 2));
+			e.Graphics.FillRectangle(new SolidBrush(headerColor),
+				useWinDropShadow ? 0 : 1, useWinDropShadow ? 0 : 1, Width - (useWinDropShadow ? 0 : 2), headerHeight + (resizeBorder * 2) - (useWinDropShadow ? 0 : 1));
 
 			topLeft = new Rectangle(0, 0, resizeBorder, resizeBorder);
 			top = new Rectangle(resizeBorder, 0, Width - (resizeBorder * 2), resizeBorder);
@@ -348,7 +362,7 @@ namespace CometUI
 			bottom = new Rectangle(resizeBorder, Height - resizeBorder, Width - (resizeBorder * 2), resizeBorder);
 			bottomRight = new Rectangle(Width - resizeBorder, Height - resizeBorder, resizeBorder, resizeBorder);
 
-			Rectangle text = new Rectangle(resizeBorder + 2, resizeBorder + 1, Width - (resizeBorder * 2) - headerHeight, headerHeight);
+			Rectangle text = new Rectangle(resizeBorder + 2, resizeBorder + (useWinDropShadow ? 2 : 1), Width - (resizeBorder * 2) - headerHeight, headerHeight);
 			if (ShowIcon)
 			{
 				text.X += headerHeight + 2;
@@ -360,7 +374,9 @@ namespace CometUI
 			if (allowCaption2) text.Width -= headerHeight;
 
 			if (ShowIcon)
-				e.Graphics.DrawIcon(Icon, new Rectangle(resizeBorder, resizeBorder, headerHeight, headerHeight + 1));
+				e.Graphics.DrawIcon(Icon, new Rectangle(
+					resizeBorder + (useWinDropShadow ? 1 : 0), resizeBorder + (useWinDropShadow ? 1 : 0),
+					headerHeight, headerHeight + 1));
 
 			e.Graphics.DrawString(Text, Font, new SolidBrush(ForeColor), text,
 				new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center });
@@ -372,13 +388,6 @@ namespace CometUI
 				new Point(close.X + 6, close.Y + 6),
 				new Point(close.X + close.Width - 6, close.Y + close.Height - 6));
 			e.Graphics.DrawLine(new Pen(close.Contains(mouse) ? closeColor : ForeColor, 1.0f),
-				new Point(close.X + close.Width - 6, close.Y + 6),
-				new Point(close.X + 6, close.Y + close.Height - 6));
-
-			e.Graphics.DrawLine(new Pen(Color.FromArgb(100, Color.White), 1.0f),
-				new Point(close.X + 6, close.Y + 6),
-				new Point(close.X + close.Width - 6, close.Y + close.Height - 6));
-			e.Graphics.DrawLine(new Pen(Color.FromArgb(100, Color.White), 1.0f),
 				new Point(close.X + close.Width - 6, close.Y + 6),
 				new Point(close.X + 6, close.Y + close.Height - 6));
 
