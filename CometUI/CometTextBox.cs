@@ -197,6 +197,9 @@ namespace CometUI
 			internalTextBox.KeyPress += (s, e) => OnKeyPress(e);
 			internalTextBox.KeyUp += (s, e) => OnKeyUp(e);
 
+			internalTextBox.Click += (s, e) => OnClick(e);
+			internalTextBox.MouseClick += (s, e) => OnMouseClick(e);
+
 			Controls.Add(internalTextBox);
 		}
 

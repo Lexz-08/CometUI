@@ -111,33 +111,23 @@ namespace CometUI
 
 			if (Checked)
 			{
-				pevent.Graphics.DrawString("r", new Font("Webdings", Math.Min(Height, 32) / 2.0f), new SolidBrush(checkColor),
-					new Rectangle(2, 3, Math.Min(Height, 32) - 4, Math.Min(Height, 32) - 4),
-					new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+				pevent.Graphics.FillRectangle(new SolidBrush(checkColor), new Rectangle(4, 4, Math.Min(Height, 32) - 8, Math.Min(Height, 32) - 8));
 
 				if (brightness > 127)
 				{
 					if (mouseOver)
-						pevent.Graphics.DrawString("r", new Font("Webdings", Math.Min(Height, 32) / 2.0f), new SolidBrush(Color.FromArgb(20, Color.Black)),
-							new Rectangle(2, 3, Math.Min(Height, 32) - 4, Math.Min(Height, 32) - 4),
-							new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+						pevent.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(20, Color.Black)), new Rectangle(4, 4, Math.Min(Height, 32) - 8, Math.Min(Height, 32) - 8));
 
 					if (mouseDown)
-						pevent.Graphics.DrawString("r", new Font("Webdings", Math.Min(Height, 32) / 2.0f), new SolidBrush(Color.FromArgb(60, Color.White)),
-							new Rectangle(2, 3, Math.Min(Height, 32) - 4, Math.Min(Height, 32) - 4),
-							new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+						pevent.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(60, Color.White)), new Rectangle(4, 4, Math.Min(Height, 32) - 8, Math.Min(Height, 32) - 8));
 				}
 				else if (brightness <= 127)
 				{
 					if (mouseOver)
-						pevent.Graphics.DrawString("r", new Font("Webdings", Math.Min(Height, 32) / 2.0f), new SolidBrush(Color.FromArgb(60, Color.White)),
-							new Rectangle(2, 3, Math.Min(Height, 32) - 4, Math.Min(Height, 32) - 4),
-							new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+						pevent.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(60, Color.White)), new Rectangle(4, 4, Math.Min(Height, 32) - 8, Math.Min(Height, 32) - 8));
 
 					if (mouseDown)
-						pevent.Graphics.DrawString("r", new Font("Webdings", Math.Min(Height, 32) / 2.0f), new SolidBrush(Color.FromArgb(40, Color.Black)),
-							new Rectangle(2, 3, Math.Min(Height, 32) - 4, Math.Min(Height, 32) - 4),
-							new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+						pevent.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(40, Color.Black)), new Rectangle(4, 4, Math.Min(Height, 32) - 8, Math.Min(Height, 32) - 8));
 				}
 			}
 
