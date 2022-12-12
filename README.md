@@ -17,8 +17,8 @@ A basic Windows Forms UI kit for simple UI creation.
 | [1.0.0^](https://github.com/Lexz-08/CometUI/releases/download/1.0.0/CometUI.dll)            | [Label](./CometUI/CometLabel.cs)                                     |
 | [1.0.0^](https://github.com/Lexz-08/CometUI/releases/download/1.0.0/CometUI.dll)            | [LinkLabel](./CometUI/CometLinkLabel.cs)                             |
 | [1.0.1 ~ 1.0.3.3](https://github.com/Lexz-08/CometUI/releases/download/1.0.3.3/CometUI.dll) | LogConsole (removed)                                                 |
-| [1.0.5.4](https://github.com/Lexz-08/CometUI/releases/download/1.0.5.4/CometUI.dll)         | [MultilineTextBox](./CometUI/CometMultilineTextBox.cs)               |
-| [1.0.5.4](https://github.com/Lexz-08/CometUI/releases/download/1.0.5.4/CometUI.dll)         | [NumericUpDown](./CometUI/CometNumericUpDown.cs)                     |
+| [1.0.5.4^](https://github.com/Lexz-08/CometUI/releases/download/1.0.5.4/CometUI.dll)         | [MultilineTextBox](./CometUI/CometMultilineTextBox.cs)               |
+| [1.0.5.4^](https://github.com/Lexz-08/CometUI/releases/download/1.0.5.4/CometUI.dll)         | [NumericUpDown](./CometUI/CometNumericUpDown.cs)                     |
 | [1.0.2^](https://github.com/Lexz-08/CometUI/releases/download/1.0.2/CometUI.dll)            | [PasswordInput](./CometUI/CometPasswordInput.cs)                     |
 | [1.0.1^](https://github.com/Lexz-08/CometUI/releases/download/1.0.1/CometUI.dll)            | [ProgressBar](./CometUI/CometProgressBar.cs)                         |
 | [1.0.0^](https://github.com/Lexz-08/CometUI/releases/download/1.0.0/CometUI.dll)            | [RadioButton](./CometUI/CometRadioButton.cs)                         |
