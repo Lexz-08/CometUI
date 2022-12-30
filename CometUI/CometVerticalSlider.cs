@@ -29,7 +29,7 @@ namespace CometUI
 			get { return value; }
 			set
 			{
-				this.value = value;
+				this.value = Math.Max(minimum, Math.Min(value, maximum));
 
 				CalculateKnobPosition();
 				OnValueChanged(null);

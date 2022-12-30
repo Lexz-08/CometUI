@@ -29,7 +29,7 @@ namespace CometUI
 			get { return value; }
 			set
 			{
-				this.value = value;
+				this.value = Math.Max(minimum, Math.Min(value, maximum));
 
 				CalculateKnobPosition();
 				OnValueChanged(null);
@@ -44,7 +44,14 @@ namespace CometUI
 		public int DefaultValue
 		{
 			get { return defValue; }
-			set { defValue = value; Invalidate(); }
+			set
+			{
+				defValue = Math.Max(minimum, Math.Min(value, maximum));
+
+				CalculateKnobPosition();
+				OnValueChanged(null);
+				Invalidate();
+			}
 		}
 
 		/// <summary>
